@@ -10,5 +10,5 @@ export default defineConfig({
     }),
   ],
 
-base: "/onlyfans-calculator/",
+  base: "/onlyfans-calculator/",
 });
