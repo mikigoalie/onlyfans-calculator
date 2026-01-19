@@ -54,7 +54,11 @@ export function classify(desc, gross) {
 
   return rule.type;
 }
-
+export function startOfHour(ts) {
+  const d = new Date(ts)
+  d.setMinutes(0, 0, 0)
+  return d.getTime()
+}
 export function categoryFromType(type) {
   if (type === "Tip") return "tips";
   if (type === "Post") return "posts";

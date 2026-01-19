@@ -1,40 +1,12 @@
-import {
-  Box,
-  Textarea,
-  SimpleGrid,
-  Stack,
-  Paper,
-  Text,
-  SegmentedControl,
-  Affix,
-  Button,
-  Grid,
-  Tooltip as MantineTooltip,
-} from "@mantine/core";
+import { Box, Textarea, SimpleGrid, Stack, Paper, Text, SegmentedControl, Affix, Button, Grid, Tooltip as MantineTooltip } from "@mantine/core";
 
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
-import {
-  usd,
-  parseTransactions,
-  categoryFromType,
-  formatHourAmPm,
-  formatMonthDay,
-} from "./utils";
-
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { usd, parseTransactions, categoryFromType, formatHourAmPm, formatMonthDay, startOfHour } from "./utils";
 
 import { useMantineColorScheme } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { useClipboard } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-
 
 function EarningsTooltip({ active, payload, label, mode }) {
   if (!active || !payload || !payload.length) return null;
@@ -61,13 +33,12 @@ function EarningsTooltip({ active, payload, label, mode }) {
   );
 }
 
-
 const App = () => {
   const [raw, setRaw] = useState("");
   const [mode, setMode] = useState("all");
   const [valueMode, setValueMode] = useState("net");
 
-const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
+  const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
 
   const totals = useMemo(() => {
     if (hasError) return null;
@@ -88,8 +59,8 @@ const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
   const data = useMemo(() => {
     if (hasError || !parsed.length) return [];
 
-    const min = Math.min(...parsed.map((p) => p.timestamp));
-    const max = Math.max(...parsed.map((p) => p.timestamp));
+    const min = startOfHour(Math.min(...parsed.map((p) => p.timestamp)));
+    const max = startOfHour(Math.max(...parsed.map((p) => p.timestamp)));
 
     const rows = [];
     for (let t = min; t <= max; t += 3600000) {
@@ -109,9 +80,11 @@ const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
     }
 
     parsed.forEach((p) => {
-      const i = Math.floor((p.timestamp - min) / 3600000);
+      const hourTs = startOfHour(p.timestamp);
+      const i = (hourTs - min) / 3600000;
+
       const category = categoryFromType(p.type);
-      if (!category) return;
+      if (!category || !rows[i]) return;
 
       const amount = valueMode === "net" ? p.net : p.gross;
 
@@ -133,11 +106,7 @@ const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
   const copyTotals = () => {
     if (!totals) return;
 
-    clipboard.copy(
-      `Total PPV\t${usd.format(totals.ppv)}\nTotal NOPPV\t${usd.format(
-        totals.noPpv
-      )}`
-    );
+    clipboard.copy(`Total PPV\t${usd.format(totals.ppv)}\nTotal NOPPV\t${usd.format(totals.noPpv)}`);
 
     notifications.show({
       title: "Copied to clipboard",
@@ -260,36 +229,23 @@ const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
                           <CartesianGrid strokeOpacity={0.05} />
                           <XAxis
                             dataKey="timestamp"
-                            interval={
-                              data.length <= 24
-                                ? 0
-                                : data.length <= 72
-                                ? 1
-                                : 3
-                            }
+                            interval={0}
+                            allowDuplicatedCategory={false}
                             tickFormatter={(v) => {
                               const d = new Date(v);
-                              const hour = formatHourAmPm(d.getHours());
-                              const prev = new Date(v - 3600000);
-                              return prev.toDateString() !== d.toDateString()
-                                ? `${formatMonthDay(v)} ${hour}`
-                                : hour;
+                              if (d.getHours() === 0) {
+                                return `${formatMonthDay(v)} ${formatHourAmPm(d.getHours())}`;
+                              }
+
+                              return formatHourAmPm(d.getHours());
                             }}
                             angle={-35}
                             textAnchor="end"
                             height={70}
                           />
                           <YAxis tickFormatter={usd.format} />
-                          <Tooltip
-                            content={<EarningsTooltip mode={mode} />}
-                          />
-                          <Area
-                            type="linear"
-                            dataKey={areaKey}
-                            stroke="#007aff"
-                            strokeWidth={2}
-                            fill="rgba(0,122,255,0.15)"
-                          />
+                          <Tooltip content={<EarningsTooltip mode={mode} />} />
+                          <Area type="linear" dataKey={areaKey} stroke="#007aff" strokeWidth={2} fill="rgba(0,122,255,0.15)" />
                         </AreaChart>
                       </ResponsiveContainer>
                     </Box>
@@ -302,7 +258,9 @@ const { parsed, hasError } = useMemo(() => parseTransactions(raw), [raw]);
       </Box>
 
       <Affix position={{ bottom: 20, right: 20 }}>
-        <Button onClick={toggleColorScheme} variant="light">Toggle theme</Button>
+        <Button onClick={toggleColorScheme} variant="light">
+          Toggle theme
+        </Button>
       </Affix>
     </>
   );
