@@ -9,8 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-  "predeploy": "bun run build",
-  "deploy": "gh-pages -d dist"
+    "predeploy": "bun run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.1",
@@ -21,6 +21,9 @@
     "@mantine/form": "^8.3.12",
     "@mantine/hooks": "^8.3.12",
     "@mantine/notifications": "^8.3.12",
+    "@tabler/icons-react": "^3.36.1",
+    "chrono-node": "^2.9.0",
+    "dayjs": "^1.11.19",
     "gh-pages": "^6.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
