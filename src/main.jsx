@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import '@gfazioli/mantine-onboarding-tour/styles.css';
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 

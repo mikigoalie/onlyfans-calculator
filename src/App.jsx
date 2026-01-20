@@ -104,7 +104,9 @@ const TopSpenders = ({ parsed }) => {
   return (
     <Paper withBorder p="md" radius="md">
       <Group justify="space-between" mb="xs">
-        <Text size="sm" fw={500}>Top 3 Spenders</Text>
+        <Text size="sm" fw={500}>
+          Top 3 Spenders
+        </Text>
         <ThemeIcon color="yellow" variant="light" size={20}>
           <IconTrophy size={14} />
         </ThemeIcon>
@@ -121,8 +123,12 @@ const TopSpenders = ({ parsed }) => {
               </Text>
             </Group>
             <Stack gap={0} align="flex-end">
-              <Text size="xs" c="dimmed">Gross: {usd.format(spender.gross)}</Text>
-              <Text size="sm" fw={500} c="green">Net: {usd.format(spender.net)}</Text>
+              <Text size="xs" c="dimmed">
+                Gross: {usd.format(spender.gross)}
+              </Text>
+              <Text size="sm" fw={500} c="green">
+                Net: {usd.format(spender.net)}
+              </Text>
             </Stack>
           </Group>
         ))}
@@ -151,8 +157,11 @@ const StatsCards = ({ totals, parsed, onCopy }) => {
       ];
     }
 
-    let tips = 0, posts = 0, subs = 0, messages = 0;
-    
+    let tips = 0,
+      posts = 0,
+      subs = 0,
+      messages = 0;
+
     parsed.forEach((p) => {
       const cat = categoryFromType(p.type);
       if (!cat) return;
@@ -181,7 +190,7 @@ const StatsCards = ({ totals, parsed, onCopy }) => {
     if (!parsed?.length) return { avgTxSize: 0 };
 
     let totalGross = 0;
-    parsed.forEach((p) => totalGross += p.gross);
+    parsed.forEach((p) => (totalGross += p.gross));
 
     return {
       avgTxSize: parsed.length ? totalGross / parsed.length : 0,
@@ -193,11 +202,23 @@ const StatsCards = ({ totals, parsed, onCopy }) => {
     noPpv: totals?.noPpv || 0,
   };
 
+  const activeHours = useMemo(() => {
+    if (!parsed?.length) return 0;
+
+    const timestamps = parsed.map((p) => p.timestamp);
+    const min = Math.min(...timestamps);
+    const max = Math.max(...timestamps);
+
+    return Math.ceil((max - min) / (60 * 60 * 1000));
+  }, [parsed]);
+
   return (
     <SimpleGrid cols={2} spacing="md" w="100%">
       <Paper withBorder p="md">
         <Group justify="space-between" mb="xs">
-          <Text size="sm" fw={500}>Performance Analytics</Text>
+          <Text size="sm" fw={500}>
+            Performance Analytics
+          </Text>
           <CopyButton value="" timeout={2000}>
             {({ copied, copy }) => (
               <MantineTooltip label={copied ? "Earnings copied" : "Copy earnings"} withArrow position="right">
@@ -220,32 +241,63 @@ const StatsCards = ({ totals, parsed, onCopy }) => {
 
         <SimpleGrid cols={2} spacing="sm">
           <Box>
-            <Text size="xs" c="dimmed">Total PPV</Text>
-            <Text size="lg" fw={700}>{usd.format(safeTotals.noPpv + safeTotals.ppv)}</Text>
+            <Text size="xs" c="dimmed">
+              Total PPV
+            </Text>
+            <Text size="lg" fw={700}>
+              {usd.format(safeTotals.noPpv + safeTotals.ppv)}
+            </Text>
           </Box>
           <Box>
-            <Text size="xs" c="dimmed">Total NoPPV</Text>
-            <Text size="lg" fw={700}>{usd.format(safeTotals.noPpv)}</Text>
+            <Text size="xs" c="dimmed">
+              Total NoPPV
+            </Text>
+            <Text size="lg" fw={700}>
+              {usd.format(safeTotals.noPpv)}
+            </Text>
           </Box>
           <Box>
-            <Text size="xs" c="dimmed">Avg Transaction</Text>
-            <Text size="lg" fw={700} c="blue">{usd.format(velocity.avgTxSize)}</Text>
+            <Text size="xs" c="dimmed">
+              Avg Transaction
+            </Text>
+            <Text size="lg" fw={700} c="blue">
+              {usd.format(velocity.avgTxSize)}
+            </Text>
           </Box>
           <Box>
-            <Text size="xs" c="dimmed">Average $ per transaction</Text>
-            <Text size="lg" fw={700} c="orange">{ usd.format((safeTotals.noPpv + safeTotals.ppv)/parsed?.length || 0)}</Text>
+            <Text size="xs" c="dimmed">
+              Total transactions
+            </Text>
+            <Text size="lg" fw={700} c="orange">
+              {parsed?.length || 0} txs
+            </Text>
           </Box>
 
-                    <Box>
-            <Text size="xs" c="dimmed">Total transactions</Text>
-            <Text size="lg" fw={700} c="orange">{parsed?.length || 0} txs</Text>
+          <Box>
+            <Text size="xs" c="dimmed">
+              Worked hours
+            </Text>
+            <Text size="lg" fw={700} c="orange">
+              {activeHours}
+            </Text>
+          </Box>
+
+          <Box>
+            <Text size="xs" c="dimmed">
+              Average per hour
+            </Text>
+            <Text size="lg" fw={700} c="orange">
+              {usd.format((safeTotals.noPpv + safeTotals.ppv) / activeHours || 0)}
+            </Text>
           </Box>
         </SimpleGrid>
       </Paper>
 
       <Paper withBorder p="md">
         <Group justify="space-between" mb="xs">
-          <Text size="sm" fw={500}>Revenue Sources</Text>
+          <Text size="sm" fw={500}>
+            Revenue Sources
+          </Text>
           <ThemeIcon color="gray" variant="light" size={20}>
             <IconChartBar size={14} />
           </ThemeIcon>
@@ -255,7 +307,9 @@ const StatsCards = ({ totals, parsed, onCopy }) => {
           {breakdown.map((item) => (
             <div key={item.label}>
               <Group justify="space-between" mb={4}>
-                <Text size="xs" c="dimmed">{item.label}</Text>
+                <Text size="xs" c="dimmed">
+                  {item.label}
+                </Text>
                 <Text size="xs" fw={500}>
                   {usd.format(item.value)} <span style={{ opacity: 0.6 }}>({Math.round(item.percent)}%)</span>
                 </Text>
@@ -384,7 +438,6 @@ export default function App() {
       >
         <Box w="90%" maw={1500} h="80%">
           <SimpleGrid cols={2} spacing="xl" style={{ height: "100%" }}>
-            {/* LEFT COLUMN */}
             <Box style={{ display: "flex", height: "100%" }}>
               <Textarea
                 placeholder="Paste copied earnings here"
@@ -398,7 +451,6 @@ export default function App() {
               />
             </Box>
 
-            {/* RIGHT COLUMN */}
             <div
               style={{
                 display: "flex",
@@ -407,15 +459,20 @@ export default function App() {
                 minHeight: 0,
               }}
             >
-              {/* UPPER SECTION */}
-              <div style={{ flex: "0 0 auto" }}>
+              {hasError ? (
+                <Alert title="Error parsing transactions" color="red" mb="md">
+                  There was an error parsing the transactions. Please ensure you have pasted valid data.
+                </Alert>
+              ) :               <div style={{ flex: "0 0 auto" }}>
                 <StatsCards totals={totals} parsed={parsed} onCopy={copyTotals} />
                 <Box mt="md">
                   <TopSpenders parsed={parsed} />
                 </Box>
               </div>
+}
 
-              {/* LOWER SECTION: Chart */}
+              
+
               <Paper
                 mt="md"
                 p="xs"
@@ -469,13 +526,7 @@ export default function App() {
                           <Area type="linear" dataKey="messagesPpv" stroke="#ff3b30" strokeWidth={2} fill="rgba(255,59,48,0.15)" />
                         </>
                       ) : (
-                        <Area
-                          type="linear"
-                          dataKey={mode === "all" ? "all" : mode}
-                          stroke="#007aff"
-                          strokeWidth={2}
-                          fill="rgba(0,122,255,0.15)"
-                        />
+                        <Area type="linear" dataKey={mode === "all" ? "all" : mode} stroke="#007aff" strokeWidth={2} fill="rgba(0,122,255,0.15)" />
                       )}
                     </AreaChart>
                   </ResponsiveContainer>

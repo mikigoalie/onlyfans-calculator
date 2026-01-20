@@ -16,6 +16,7 @@
     "@codemirror/commands": "^6.10.1",
     "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.11",
+    "@gfazioli/mantine-onboarding-tour": "^2.6.8",
     "@mantine/charts": "^8.3.12",
     "@mantine/core": "^8.3.12",
     "@mantine/form": "^8.3.12",
@@ -27,6 +28,7 @@
     "gh-pages": "^6.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-joyride": "^2.9.3",
     "recharts": "^3.6.0"
   },
   "devDependencies": {
