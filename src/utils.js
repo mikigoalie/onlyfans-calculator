@@ -115,7 +115,25 @@ export function parseTransactions(raw) {
       let row = null;
 
       if (lines[i].includes("\t")) {
-        row = parseRow(lines[i]);
+        // Check if this is the new hybrid format (money on same line, description on next)
+        const cells = lines[i].split("\t").map((c) => c.trim());
+        const moneyIndexes = cells.map((c, i) => (c.startsWith("$") ? i : null)).filter((i) => i !== null);
+        
+        if (moneyIndexes.length >= 3) {
+          const descOnSameLine = cells.slice(moneyIndexes[2] + 1).join(" ").trim();
+          
+          // If description is empty or very short, check next line
+          if (!descOnSameLine || descOnSameLine.length < 3) {
+            const nextLineDesc = lines[i + 1] || "";
+            const combinedLine = lines[i] + "\t" + nextLineDesc;
+            row = parseRow(combinedLine);
+            if (row) {
+              i++; // Skip the description line
+            }
+          } else {
+            row = parseRow(lines[i]);
+          }
+        }
       } else if (parseDateTime(lines[i]) && lines[i + 1]?.startsWith("$") && lines[i + 2]?.startsWith("$") && lines[i + 3]?.startsWith("$")) {
         const combined = [lines[i], lines[i + 1], lines[i + 2], lines[i + 3], lines[i + 4] || ""].join("\t");
 
